@@ -1,18 +1,45 @@
-let buttoon = document.querySelector("button");
-let id = 0;
-buttoon.addEventListener("click", function (e)
-{
-    let todo_list = document.querySelector('.todos');
-    let input = document.querySelector('input');
-    let para = document.createElement("p");
-    para.innerHTML = input.value;
-    para.setAttribute("key", id);
-    todo_list.appendChild(para)
-    input.value = ""
-    id+= 1;
-    document.querySelector(`p[key="${id-1}"]`).addEventListener("click", function(e)
-    {
-        let todolist = document.querySelector('.todos');
-        todolist.removeChild(this);
-    })
+let todoList;
+featchItem();
+document.querySelector("#btn1").addEventListener("click", () => {
+    loadItems(todoList);
 });
+document.querySelector("#btn2").addEventListener("click", () => {
+    let completedTodoList = todoList.filter(ele => ele.completed);
+    loadItems(completedTodoList);
+});
+document.querySelector("#btn3").addEventListener("click", () => {
+    let pendingTodoList = todoList.filter(ele => !ele.completed);
+    loadItems(pendingTodoList);
+});
+function featchItem() {
+    let xml = new XMLHttpRequest;
+    xml.open("GET", "https://jsonplaceholder.typicode.com/todos", true);
+
+    xml.onload = function () {
+        todoList = JSON.parse(this.responseText);
+        loadItems(todoList);
+    }
+    xml.send();
+}
+function loadItems(list) {
+    let todoArea = document.querySelector("#todoArea");
+    let html = "";
+    list.forEach(ele => {
+        let val
+        if (ele.completed) {
+            val = "Completed"
+        }
+        else {
+            val = "Pending"
+        }
+        html += `<div class="card" style="width: 18rem; margin: 10px">
+        <div class="card-body">
+            <h5 class="card-title">${ele.title}</h5>
+            <p class="card-text">User Id :  ${ele.userId}</p>
+            <p class="card-text">Id :  ${ele.id}</p>
+            <p class="card-text">Status : ${val}</p>
+        </div>
+        </div>`;
+    });
+    todoArea.innerHTML = html;
+}
